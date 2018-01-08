@@ -4,8 +4,14 @@ import { Link } from "react-router-dom";
 import * as BooksAPI from "./BooksAPI";
 
 class SearchBooks extends Component {
+  constructor(props) {
+    super(props);
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
   static propTypes = {
-    books: PropTypes.array.isRequired
+    onUpdateShelf: PropTypes.func.isRequired
   };
 
   state = {
@@ -34,6 +40,11 @@ class SearchBooks extends Component {
   clearQuery = () => {
     this.setState({ query: "" });
   };
+
+  handleChange(event, book) {
+    event.preventDefault();
+    this.props.onUpdateShelf(book, event.target.value);
+  }
 
   render() {
     const { queriedBooks, query } = this.state;
@@ -79,7 +90,10 @@ class SearchBooks extends Component {
                         }}
                       />
                       <div className="book-shelf-changer">
-                        <select>
+                        <select
+                          defaultValue="none"
+                          onChange={event => this.handleChange(event, book)}
+                        >
                           <option value="none" disabled>
                             Move to...
                           </option>
@@ -92,7 +106,7 @@ class SearchBooks extends Component {
                         </select>
                       </div>
                     </div>
-                    <div className="book-title">{book.title}</div>
+                    <div className="book-title">{book.title} {book.shelf}</div>
                     {book.authors &&
                       book.authors.map(author => (
                         <div key={author} className="book-authors">
