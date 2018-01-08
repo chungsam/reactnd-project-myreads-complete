@@ -4,7 +4,7 @@ import SearchBooks from "./SearchBooks";
 import * as BooksAPI from "./BooksAPI";
 import { Route } from "react-router-dom";
 import "./App.css";
-import sortBy from 'sort-by'
+import sortBy from "sort-by";
 
 class BooksApp extends React.Component {
   state = {
@@ -25,7 +25,6 @@ class BooksApp extends React.Component {
 
   updateShelf = (book, shelf) => {
     BooksAPI.update(book, shelf).then(res => {
-
       // Reload books from server
       this.loadBooks();
 
@@ -47,12 +46,19 @@ class BooksApp extends React.Component {
 
       // Let user know if it was successful.
       if (res) {
-        alert(`Book successfully ${shelfFormatted !== "" ? `moved to ${shelfFormatted} shelf!` : `Removed from shelf.`}`);
+        alert(
+          `Book successfully ${
+            shelfFormatted !== ""
+              ? `moved to ${shelfFormatted} shelf!`
+              : `Removed from shelf.`
+          }`
+        );
       } else {
-        alert(`Something went wrong. Book was not successfully moved to shelf.`);
+        alert(
+          `Something went wrong. Book was not successfully moved to shelf.`
+        );
       }
     });
-
   };
 
   render() {
@@ -71,9 +77,12 @@ class BooksApp extends React.Component {
         <Route
           exact
           path="/search"
-          render={() => (
+          render={({ history }) => (
             <SearchBooks
-              onUpdateShelf={(book, shelf) => this.updateShelf(book, shelf)}
+              onUpdateShelf={(book, shelf) => {
+                this.updateShelf(book, shelf);
+                history.push("/");
+              }}
             />
           )}
         />
