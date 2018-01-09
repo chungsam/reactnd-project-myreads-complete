@@ -1,3 +1,33 @@
+# Udacity React Nanodegree - MyReads project
+By: Sam Chung
+
+This is the first project for the [Udacity React Nanodegree](https://www.udacity.com/course/react-nanodegree--nd019). It demonstrates a simple React "bookshelf" app that allows you to make fetch a list of book from a remote server, search for books, and assign books to different shelves.
+
+While I was responsible for implementing the core functionality of the app, the initial project structure as well as app styling was provided via this starter template: https://github.com/udacity/reactnd-project-myreads-starter. Udacity also provided the API endpoints for fetching and updating the books.
+
+## To get started:
+Getting started is simple. First install the project dependencies:
+```
+$ npm install
+```
+
+Then start up the development server:
+```
+$ npm start
+```
+
+Starting up the development server should also launch a browser that points to the appropriate localhost endpoint.
+
+**Optional**
+If you'd like to build the project to serve from a static server:
+```
+$ npm run build
+```
+
+Below is the README from the starter template.
+
+---
+
 # MyReads Project
 
 This is the starter template for the final assessment project for Udacity's React Fundamentals course. The goal of this template is to save you time by providing a static example of the CSS and HTML markup that may be used, but without any of the React code that is needed to complete the project. If you choose to start with this template, your job will be to add interactivity to the app by refactoring the static code in this template.
