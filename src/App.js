@@ -9,43 +9,60 @@ import sortBy from "sort-by";
 class BooksApp extends React.Component {
   state = {
     books: [],
-    shelf: {}
+    myBooks: []
   };
 
   componentDidMount() {
-    this.loadBooks();
+    this.loadMyBooks();
   }
 
-  loadBooks() {
+  loadBooks() {}
+
+  loadMyBooks() {
+    // First get all books from server
     BooksAPI.getAll().then(books => {
-      books.sort(sortBy("title"));
+      this.setState({ myBooks: [] });
+
+      let { myBooks } = this.state;
+      // Assign books to my shelf
+      books.map(book => {
+        switch (book.shelf) {
+          case "currentlyReading":
+          case "wantToRead":
+          case "read":
+            myBooks.push(book);
+            break;
+        }
+      });
+
+      // Update state
       this.setState({ books });
+      this.setState({ myBooks });
     });
   }
 
-  updateShelf = (book, shelf) => {
+  updateMyBooks = (book, shelf) => {
     BooksAPI.update(book, shelf).then(res => {
-      // Reload books from server
-      this.loadBooks();
-
-      // Format shelf name for alert.
-      let shelfFormatted;
-      switch (shelf) {
-        case "currentlyReading":
-          shelfFormatted = `'Currently Reading'`;
-          break;
-        case "wantToRead":
-          shelfFormatted = `"Want to Read"`;
-          break;
-        case "read":
-          shelfFormatted = `"Read"`;
-          break;
-        default:
-          shelfFormatted = "";
-      }
-
-      // Let user know if it was successful.
       if (res) {
+        this.loadMyBooks();
+
+        // Format shelf name for alert.
+        let shelfFormatted;
+        switch (shelf) {
+          case "currentlyReading":
+            shelfFormatted = `'Currently Reading'`;
+            break;
+          case "wantToRead":
+            shelfFormatted = `"Want to Read"`;
+            break;
+          case "read":
+            shelfFormatted = `"Read"`;
+            break;
+          default:
+            shelfFormatted = "";
+        }
+
+        // Let user know if it was successful.
         alert(
           `Book successfully ${
             shelfFormatted !== ""
@@ -61,7 +78,16 @@ class BooksApp extends React.Component {
     });
   };
 
+  getBookShelf = bookId => {
+    const book = this.state.books.find(book => book.id === bookId);
+    if (book) {
+      return book.shelf;
+    }
+  };
+
   render() {
+    const { myBooks } = this.state;
+
     return (
       <div>
         <Route
@@ -69,8 +95,8 @@ class BooksApp extends React.Component {
           path="/"
           render={() => (
             <ListBooks
-              books={this.state.books}
-              onUpdateShelf={(book, shelf) => this.updateShelf(book, shelf)}
+              myBooks={myBooks}
+              onUpdateMyBooks={(book, shelf) => this.updateMyBooks(book, shelf)}
             />
           )}
         />
@@ -79,10 +105,12 @@ class BooksApp extends React.Component {
           path="/search"
           render={({ history }) => (
             <SearchBooks
-              onUpdateShelf={(book, shelf) => {
-                this.updateShelf(book, shelf);
+              myBooks={myBooks}
+              onUpdateMyBooks={(book, shelf) => {
+                this.updateMyBooks(book, shelf);
                 history.push("/");
               }}
+              getBookShelf={this.getBookShelf}
             />
           )}
         />

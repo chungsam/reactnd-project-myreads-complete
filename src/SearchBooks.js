@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import * as BooksAPI from "./BooksAPI";
+import Book from "./Book";
 
 class SearchBooks extends Component {
   constructor(props) {
@@ -11,12 +12,14 @@ class SearchBooks extends Component {
   }
 
   static propTypes = {
-    onUpdateShelf: PropTypes.func.isRequired
+    myBooks: PropTypes.array.isRequired,
+    onUpdateMyBooks: PropTypes.func.isRequired,
+    getBookShelf: PropTypes.func.isRequired
   };
 
   state = {
     query: "",
-    queriedBooks: []
+    searchedBooks: []
   };
 
   updateQuery = query => {
@@ -26,12 +29,13 @@ class SearchBooks extends Component {
   searchBooks = query => {
     if (query) {
       BooksAPI.search(query).then(results => {
-        // if (results) {
-        this.setState(state => ({ queriedBooks: results }));
-        // }
+        if (results) {
+          this.updateBookShelf(results);
+          this.setState(state => ({ searchedBooks: results }));
+        }
       });
     } else {
-      this.setState({ queriedBooks: [] });
+      this.setState({ searchedBooks: [] });
     }
 
     this.updateQuery(query);
@@ -43,11 +47,28 @@ class SearchBooks extends Component {
 
   handleChange(event, book) {
     event.preventDefault();
-    this.props.onUpdateShelf(book, event.target.value);
+    this.props.onUpdateMyBooks(book, event.target.value);
+  }
+
+  updateBookShelf = (searchedBooks) => {
+    if (searchedBooks.length > 0) {
+      searchedBooks.map(book => {
+        const shelf = this.props.getBookShelf(book.id);
+
+        if (shelf) {
+          book.shelf = shelf;
+        } else {
+          book.shelf = "none";
+        }
+      });
+    }
   }
 
   render() {
-    const { queriedBooks, query } = this.state;
+    const { searchedBooks, query } = this.state;
+    const { onUpdateMyBooks, getBookShelf } = this.props;
+
+
 
     return (
       <div className="search-books">
@@ -74,47 +95,13 @@ class SearchBooks extends Component {
         </div>
         <div className="search-books-results">
           <ol className="books-grid">
-            {queriedBooks.length > 0 &&
-              queriedBooks.map(book => (
-                <li key={book.id}>
-                  <div className="book">
-                    <div className="book-top">
-                      <div
-                        className="book-cover"
-                        style={{
-                          width: 128,
-                          height: 193,
-                          backgroundImage: `url(${
-                            book.imageLinks ? book.imageLinks.thumbnail : ""
-                          })`
-                        }}
-                      />
-                      <div className="book-shelf-changer">
-                        <select
-                          defaultValue="none"
-                          onChange={event => this.handleChange(event, book)}
-                        >
-                          <option value="none" disabled>
-                            Move to...
-                          </option>
-                          <option value="currentlyReading">
-                            Currently Reading
-                          </option>
-                          <option value="wantToRead">Want to Read</option>
-                          <option value="read">Read</option>
-                          <option value="none">None</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="book-title">{book.title} {book.shelf}</div>
-                    {book.authors &&
-                      book.authors.map(author => (
-                        <div key={author} className="book-authors">
-                          {author}
-                        </div>
-                      ))}
-                  </div>
-                </li>
+            {searchedBooks.length > 0 &&
+              searchedBooks.map(book => (
+                <Book
+                  key={book.id}
+                  book={book}
+                  onUpdateMyBooks={onUpdateMyBooks}
+                />
               ))}
           </ol>
         </div>
