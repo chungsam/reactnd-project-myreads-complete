@@ -4,9 +4,6 @@ import PropTypes from "prop-types";
 import Book from "./Book";
 
 class ListBooks extends Component {
-  constructor(props) {
-    super(props);
-  }
   static propTypes = {
     myBooks: PropTypes.array.isRequired,
     onUpdateMyBooks: PropTypes.func.isRequired

@@ -16,24 +16,29 @@ class BooksApp extends React.Component {
     this.loadMyBooks();
   }
 
-  loadBooks() {}
-
   loadMyBooks() {
     // First get all books from server
     BooksAPI.getAll().then(books => {
+      // Clear existing shelf and start off fresh
       this.setState({ myBooks: [] });
 
       let { myBooks } = this.state;
       // Assign books to my shelf
-      books.map(book => {
+      books.forEach(book => {
         switch (book.shelf) {
           case "currentlyReading":
           case "wantToRead":
           case "read":
             myBooks.push(book);
             break;
+          default:
+            // Don't do anything
+            break;
         }
       });
+
+      // Sort by title
+      myBooks.sort(sortBy("title"));
 
       // Update state
       this.setState({ books });

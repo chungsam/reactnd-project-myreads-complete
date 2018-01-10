@@ -26,6 +26,10 @@ class SearchBooks extends Component {
     this.setState({ query: query.trim() });
   };
 
+  clearQuery = () => {
+    this.setState({ query: "" });
+  };
+
   searchBooks = query => {
     if (query) {
       BooksAPI.search(query).then(results => {
@@ -41,18 +45,16 @@ class SearchBooks extends Component {
     this.updateQuery(query);
   };
 
-  clearQuery = () => {
-    this.setState({ query: "" });
-  };
-
   handleChange(event, book) {
     event.preventDefault();
     this.props.onUpdateMyBooks(book, event.target.value);
   }
 
-  updateBookShelf = (searchedBooks) => {
+ // Checks the searched books against the myBooks and updates it with
+ // the correct shelf
+  updateBookShelf = searchedBooks => {
     if (searchedBooks.length > 0) {
-      searchedBooks.map(book => {
+      searchedBooks.forEach(book => {
         const shelf = this.props.getBookShelf(book.id);
 
         if (shelf) {
@@ -62,13 +64,11 @@ class SearchBooks extends Component {
         }
       });
     }
-  }
+  };
 
   render() {
     const { searchedBooks, query } = this.state;
-    const { onUpdateMyBooks, getBookShelf } = this.props;
-
-
+    const { onUpdateMyBooks} = this.props;
 
     return (
       <div className="search-books">
